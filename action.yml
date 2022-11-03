@@ -5,6 +5,10 @@ inputs:
   aws-assume-role:
     description: 'The ARN of an AWS IAM role to assume. Used to auth with AWS to upload results to S3.'
     required: true
+  gosec-args:
+    description: 'Override the arguments passed to the gosec command.'
+    required: false
+    default: '--exclude-generated=true --severity=medium --concurrency=1 --fmt json --out=gosec-results.json --stdout --verbose=text --no-fail ./...'
 
 runs:
   using: "composite"
@@ -18,7 +22,7 @@ runs:
     - name: Run Gosec Security Scanner
       uses: securego/gosec@v2.14.0
       with:
-        args: --exclude-generated=true --severity=medium --concurrency=1 --fmt json --out=gosec-results.json --stdout --verbose=text --no-fail ./...
+        args: ${{ inputs.gosec-args }}
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
