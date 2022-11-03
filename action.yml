@@ -29,3 +29,8 @@ runs:
       shell: bash
       run: |
         aws s3 cp ./gosec-results.json s3://launchdarkly-org-security-inventory/scan-results/gosec/${{ steps.date.outputs.date }}/$GITHUB_REPOSITORY.json
+    - name: Upload scan results artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: gosec-results
+        path: gosec-results.json
