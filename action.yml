@@ -1,6 +1,11 @@
 name: 'LaunchDarkly Gosec'
 description: 'Run gosec and upload the resutls to s3 and workflow artifacts'
 
+inputs:
+  aws-assume-role:
+    description: 'The ARN of an AWS IAM role to assume. Used to auth with AWS to upload results to S3.'
+    required: true
+
 runs:
   using: "composite"
   steps:
@@ -12,14 +17,13 @@ runs:
       uses: actions/checkout@v3
     - name: Run Gosec Security Scanner
       uses: securego/gosec@2.14.0
-      timeout-minutes: 5
       with:
         args: --exclude-generated=true --severity=medium --concurrency=1 --fmt json --out=gosec-results.json --stdout --verbose=text --no-fail ./...
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         audience: https://github.com/launchdarkly
-        role-to-assume: ${{ secrets.ORG_SECURITY_GHA_ROLE_ARN }}
+        role-to-assume: ${{ inputs.aws-assume-role }}
         aws-region: us-east-1
     - name: Upload scan results to S3
       shell: bash
