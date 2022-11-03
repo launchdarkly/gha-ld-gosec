@@ -16,7 +16,7 @@ runs:
     - name: Get date partition
       shell: bash
       id: date-partition
-      run: echo "DATE_PARTITION=date::$(date +'%Y/%m/%d')" >> $GITHUB_OUTPUT
+      run: echo "DATE_PARTITION=$(date +'%Y/%m/%d')" >> $GITHUB_OUTPUT
     - name: Checkout Source
       uses: actions/checkout@v3
     - name: Run Gosec Security Scanner
