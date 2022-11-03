@@ -13,10 +13,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Get current date
+    - name: Get date partition
       shell: bash
-      id: date
-      run: echo "::set-output name=date::$(date +'%Y/%m/%d')"
+      id: date-partition
+      run: echo "DATE_PARTITION=date::$(date +'%Y/%m/%d')" >> $GITHUB_OUTPUT
     - name: Checkout Source
       uses: actions/checkout@v3
     - name: Run Gosec Security Scanner
@@ -32,7 +32,7 @@ runs:
     - name: Upload scan results to S3
       shell: bash
       run: |
-        aws s3 cp ./gosec-results.json s3://launchdarkly-org-security-inventory/scan-results/gosec/${{ steps.date.outputs.date }}/$GITHUB_REPOSITORY.json
+        aws s3 cp ./gosec-results.json s3://launchdarkly-org-security-inventory/scan-results/gosec/${{ steps.date-partition.outputs.DATE_PARTITION }}/$GITHUB_REPOSITORY.json
     - name: Upload scan results artifact
       uses: actions/upload-artifact@v3
       with:
