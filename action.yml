@@ -1,27 +1,40 @@
 name: 'LaunchDarkly Gosec'
 description: 'Run gosec and upload the resutls to s3 and workflow artifacts'
 
+inputs:
+  aws-assume-role:
+    description: 'The ARN of an AWS IAM role to assume. Used to auth with AWS to upload results to S3.'
+    required: true
+  gosec-args:
+    description: 'Override the arguments passed to the gosec command.'
+    required: false
+    default: '--exclude-generated=true --severity=medium --concurrency=1 --fmt json --out=gosec-results.json --stdout --verbose=text --no-fail ./...'
+
 runs:
   using: "composite"
   steps:
-    - name: Get current date
+    - name: Get date partition
       shell: bash
-      id: date
-      run: echo "::set-output name=date::$(date +'%Y/%m/%d')"
+      id: date-partition
+      run: echo "DATE_PARTITION=$(date +'%Y/%m/%d')" >> $GITHUB_OUTPUT
     - name: Checkout Source
       uses: actions/checkout@v3
     - name: Run Gosec Security Scanner
-      uses: securego/gosec@2.14.0
-      timeout-minutes: 5
+      uses: securego/gosec@v2.14.0
       with:
-        args: --exclude-generated=true --severity=medium --concurrency=1 --fmt json --out=gosec-results.json --stdout --verbose=text --no-fail ./...
+        args: ${{ inputs.gosec-args }}
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v1-node16
       with:
         audience: https://github.com/launchdarkly
-        role-to-assume: ${{ secrets.ORG_SECURITY_GHA_ROLE_ARN }}
+        role-to-assume: ${{ inputs.aws-assume-role }}
         aws-region: us-east-1
     - name: Upload scan results to S3
       shell: bash
       run: |
-        aws s3 cp ./gosec-results.json s3://launchdarkly-org-security-inventory/scan-results/gosec/${{ steps.date.outputs.date }}/$GITHUB_REPOSITORY.json
+        aws s3 cp ./gosec-results.json s3://launchdarkly-org-security-inventory/scan-results/gosec/${{ steps.date-partition.outputs.DATE_PARTITION }}/$GITHUB_REPOSITORY.json
+    - name: Upload scan results artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: gosec-results
+        path: gosec-results.json
