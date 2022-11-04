@@ -1,5 +1,6 @@
 name: 'LaunchDarkly Gosec'
 description: 'Run gosec and upload the resutls to s3 and workflow artifacts'
+author: '@kparkinson-ld'
 
 inputs:
   aws-assume-role:
