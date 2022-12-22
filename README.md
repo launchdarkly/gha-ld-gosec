@@ -24,7 +24,7 @@ jobs:
     env:
       GO111MODULE: on
     steps:
-      - uses: launchdarkly/gha-ld-gosec@v1
+      - uses: launchdarkly/gha-ld-gosec@v2
         with:
           aws-assume-role: ${{ secrets.ORG_SECURITY_GHA_ROLE_ARN }}
           s3-bucket: ${{ secrets.ORG_SECURITY_INVENTORY_BUCKET }}
