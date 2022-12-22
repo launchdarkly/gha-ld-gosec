@@ -6,6 +6,13 @@ inputs:
   aws-assume-role:
     description: 'The ARN of an AWS IAM role to assume. Used to auth with AWS to upload results to S3.'
     required: true
+  s3-bucket:
+    description: 'Name of the s3 bucket to upload results to.'
+    required: true
+  s3-path:
+    description: 'Path to write results to within the s3 bucket.'
+    required: false
+    default: 'scan-results/gosec'
   gosec-args:
     description: 'Override the arguments passed to the gosec command.'
     required: false
@@ -33,7 +40,7 @@ runs:
     - name: Upload scan results to S3
       shell: bash
       run: |
-        aws s3 cp ./gosec-results.json s3://launchdarkly-org-security-inventory/scan-results/gosec/${{ steps.date-partition.outputs.DATE_PARTITION }}/$GITHUB_REPOSITORY.json
+        aws s3 cp ./gosec-results.json s3://${{ inputs.s3-bucket }}/${{ inputs.s3-path }}/${{ steps.date-partition.outputs.DATE_PARTITION }}/$GITHUB_REPOSITORY.json
     - name: Upload scan results artifact
       uses: actions/upload-artifact@v3
       with:
