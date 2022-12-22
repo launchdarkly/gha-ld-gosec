@@ -27,6 +27,7 @@ jobs:
       - uses: launchdarkly/gha-ld-gosec@v1
         with:
           aws-assume-role: ${{ secrets.ORG_SECURITY_GHA_ROLE_ARN }}
+          s3-bucket: ${{ secrets.ORG_SECURITY_INVENTORY_BUCKET }}
 
 ```
 
@@ -34,6 +35,8 @@ jobs:
 | name                | required | type   | default         | description |
 | ------------------- | ---      | ------ | --------------- | ----------- |
 | aws-assume-role     | yes      | string |                 | The ARN of an AWS IAM role to assume. Used to auth with AWS to upload results to S3. |
+| s3-bucket           | yes      | string |                 | Name of the s3 bucket to upload results to. |
+| s3-path             | no       | string | `scan-results/gosec` | Path to write results to within the s3 bucket. |
 | gosec-args          | no       | string | `'--exclude-generated=true --severity=medium --concurrency=1 --fmt json --out=gosec-results.json --stdout --verbose=text --no-fail ./...'` | Override the arguments passed to the gosec command. |
 
 ## Release tags
