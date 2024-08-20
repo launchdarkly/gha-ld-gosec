@@ -26,13 +26,13 @@ runs:
       id: date-partition
       run: echo "DATE_PARTITION=$(date +'%Y/%m/%d')" >> $GITHUB_OUTPUT
     - name: Checkout Source
-      uses: actions/checkout@v3
+      uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # pin@v3
     - name: Run Gosec Security Scanner
-      uses: securego/gosec@v2.18.0
+      uses: securego/gosec@6fbd381238e97e1d1f3358f0d6d65de78dcf9245 # pin@v2.20.0
       with:
         args: ${{ inputs.gosec-args }}
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1-node16
+      uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef # pin@v1-node16
       with:
         audience: https://github.com/launchdarkly
         role-to-assume: ${{ inputs.aws-assume-role }}
@@ -42,7 +42,7 @@ runs:
       run: |
         aws s3 cp ./gosec-results.json s3://${{ inputs.s3-bucket }}/${{ inputs.s3-path }}/${{ steps.date-partition.outputs.DATE_PARTITION }}/$GITHUB_REPOSITORY.json
     - name: Upload scan results artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # pin@v3
       with:
         name: gosec-results
         path: gosec-results.json
